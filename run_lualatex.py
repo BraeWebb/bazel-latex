@@ -40,15 +40,19 @@ for external in sorted(os.listdir("external")):
     output_file,
 ) = sys.argv[1:ARGS_COUNT]
 
+texinputs = ":".join(texinputs)
+
 env = dict(os.environ)
-env["OPENTYPEFONTS"] = ":".join(texinputs)
+env["OPENTYPEFONTS"] = texinputs
 env["PATH"] = "%s:%s" % (os.path.abspath("bin"), env["PATH"])
 env["SOURCE_DATE_EPOCH"] = "0"
-env["TEXINPUTS"] = ":".join(texinputs)
+env["TEXINPUTS"] = texinputs
 env["TEXMF"] = os.path.abspath("texmf/texmf-dist")
 env["TEXMFCNF"] = os.path.abspath("texmf/texmf-dist/web2c")
 env["TEXMFROOT"] = os.path.abspath("texmf")
-env["TTFONTS"] = ":".join(texinputs)
+env["TTFONTS"] = texinputs
+env["BIBINPUTS"] = texinputs
+env["BSTINPUTS"] = texinputs
 
 os.mkdir("bin")
 shutil.copy(kpsewhich_file, "bin/kpsewhich")
