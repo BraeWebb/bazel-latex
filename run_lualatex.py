@@ -43,7 +43,25 @@ for external in sorted(os.listdir("external")):
 
 texinputs = ":".join(texinputs) + (":" + extra_inputs if extra_inputs else "")
 
-texinputs = ":".join(texinputs)
+# For most cases adding the declared inputs directories to the texinputs
+# is sufficient, however, on some platforms BIBINPUTS is not recognised.
+#
+# All .bib files in the inputs are copied over to texmf/texmf-dist/bibtex/bib
+# the path to the directory is encoded so that the directory
+# tl/sl/base would become tl_sl_base
+inputs = extra_inputs.split(":")
+for directory in inputs:
+    dst = os.path.join("texmf", "texmf-dist", "bibtex", "bib", directory.replace("/", "_"))
+    try:
+        os.makedirs(dst)
+    except OSError:
+        pass
+
+    for file in os.listdir(directory):
+        if not file.endswith(".bib"):
+            continue
+        src = os.path.abspath(os.path.join(directory, file))
+        shutil.copy(src, dst)
 
 env = dict(os.environ)
 env["OPENTYPEFONTS"] = texinputs
