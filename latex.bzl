@@ -1,5 +1,6 @@
 def _latex_pdf_impl(ctx):
     toolchain = ctx.toolchains["@bazel_latex//:latex_toolchain_type"].latexinfo
+    inputs_paths = ":".join([f.path + "//" for f in ctx.files.inputs])
     ctx.actions.run(
         mnemonic = "LuaLatex",
         use_default_shell_env = True,
@@ -13,6 +14,7 @@ def _latex_pdf_impl(ctx):
             ctx.label.name,
             ctx.files.main[0].path,
             ctx.outputs.out.path,
+            inputs_paths,
         ] + ctx.attr.cmd_flags,
         inputs = depset(
             direct = ctx.files.main + ctx.files.srcs + ctx.files._latexrun,
@@ -31,6 +33,7 @@ _latex_pdf = rule(
     attrs = {
         "main": attr.label(allow_files = True),
         "srcs": attr.label_list(allow_files = True),
+        "inputs": attr.label_list(allow_files = True),
         "cmd_flags": attr.string_list(
             allow_empty = True,
             default = [],
@@ -50,11 +53,12 @@ _latex_pdf = rule(
     implementation = _latex_pdf_impl,
 )
 
-def latex_document(name, main, srcs = [], tags = [], cmd_flags = []):
+def latex_document(name, main, srcs = [], inputs = [], tags = [], cmd_flags = []):
     # PDF generation.
     _latex_pdf(
         name = name,
         srcs = srcs + ["@bazel_latex//:core_dependencies"],
+        inputs = inputs,
         main = main,
         tags = tags,
         cmd_flags = cmd_flags,

@@ -6,7 +6,19 @@ import shutil
 import subprocess
 import sys
 
-ARGS_COUNT = 9
+ARGS_COUNT = 10
+
+(
+    kpsewhich_file,
+    luatex_file,
+    bibtex_file,
+    biber_file,
+    latexrun_file,
+    job_name,
+    main_file,
+    output_file,
+    extra_inputs,
+) = sys.argv[1:ARGS_COUNT]
 
 # Walk through all externals. If they start with the special prefix
 # texlive_{extra,texmf}__ prefix, it means they should be part of the
@@ -29,16 +41,7 @@ for external in sorted(os.listdir("external")):
     else:
         texinputs.append(src)
 
-(
-    kpsewhich_file,
-    luatex_file,
-    bibtex_file,
-    biber_file,
-    latexrun_file,
-    job_name,
-    main_file,
-    output_file,
-) = sys.argv[1:ARGS_COUNT]
+texinputs = ":".join(texinputs) + (":" + extra_inputs if extra_inputs else "")
 
 texinputs = ":".join(texinputs)
 
