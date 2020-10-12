@@ -51,6 +51,13 @@ texinputs = ":".join(texinputs) + (":" + extra_inputs if extra_inputs else "")
 # tl/sl/base would become tl_sl_base
 inputs = extra_inputs.split(":")
 for directory in inputs:
+    if not directory:
+        continue
+
+    if not os.path.isdir(directory):
+        print("Inputs directory " + directory + " does not exist", file=sys.stderr)
+        exit(1)
+
     dst = os.path.join("texmf", "texmf-dist", "bibtex", "bib", directory.replace("/", "_"))
     try:
         os.makedirs(dst)
